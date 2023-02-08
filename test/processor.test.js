@@ -253,6 +253,29 @@ describe('Processor', function() {
         .saveToFile(testFile);
     });
 
+    it('should write cpu usage stats', function(done) {
+      this.timeout(60000);
+      var testFile = path.join(this.testdir, 'testvideo.avi');
+      this.files.push(testFile);
+      const cpuStatsFile = `${this.testdir}/time.txt`;
+      this.files.push(cpuStatsFile);
+
+      this.getCommand({ source: this.testfileName, logger: testhelper.logger, cwd: this.testdir, 
+        measureCpu: { 
+          output: cpuStatsFile,
+          format: "%C %U"
+        } })
+        .usingPreset('divx')
+        .on('error', function(err, stdout, stderr) {
+          testhelper.logError(err, stdout, stderr);
+          assert.ok(!err);
+        })
+        .on('end', function() {
+          done();
+        })
+        .saveToFile(testFile);
+    });
+
     it('should kill the process on timeout', function(done) {
       var testFile = path.join(__dirname, 'assets', 'testProcessKillTimeout.avi');
       this.files.push(testFile);
